@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "output": "export",
     "postinstall": "npx prisma generate",
     "lint": "next lint",
     "email": "cp .env ./node_modules/react-email && email dev --dir src/email --port 3001"
