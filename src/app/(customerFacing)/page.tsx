@@ -1,71 +1,86 @@
-import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard"
-import { Button } from "@/components/ui/button"
-import db from "@/db/db"
-import { cache } from "@/lib/cache"
-import { Product } from "@prisma/client"
-import { ArrowRight } from "lucide-react"
-import Link from "next/link"
-import { Suspense } from "react"
-import Hero from "@/components/Hero/page"
-import CtaBlock from "@/components/CtaBlock/page"
-import Contact from "@/components/Contact/page"
+import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard";
+import { Button } from "@/components/ui/button";
+import db from "@/db/db";
+import { cache } from "@/lib/cache";
+import { Product } from "@prisma/client";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import Hero from "@/components/Hero/page";
+import CtaBlock from "@/components/CtaBlock/page";
+import Contact from "@/components/Contact/page";
+import Footer from "@/components/Footer/page";
 
+// Fetch the 6 most popular products
 const getMostPopularProducts = cache(
-  () => {
-    return db.product.findMany({
+  () =>
+    db.product.findMany({
       where: { isAvailableForPurchase: true },
       orderBy: { orders: { _count: "desc" } },
       take: 6,
-    })
-  },
+    }),
   ["/", "getMostPopularProducts"],
   { revalidate: 60 * 60 * 24 }
-)
+);
 
-const getNewestProducts = cache(() => {
-  return db.product.findMany({
-    where: { isAvailableForPurchase: true },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  })
-}, ["/", "getNewestProducts"])
+// Fetch top 3 categories and their 6 newest products
+const getTopCategoriesWithProducts = cache(
+  () =>
+    db.category.findMany({
+      take: 3,
+      orderBy: { name: "asc" },
+      include: {
+        products: {
+          where: { isAvailableForPurchase: true },
+          take: 6,
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    }),
+  ["/", "getTopCategoriesWithProducts"]
+);
 
-export default function HomePage() {
+export default async function HomePage() {
+  const categories = await getTopCategoriesWithProducts();
+  const mostPopularProducts = await getMostPopularProducts();
+
   return (
-    <main className="">
-      <div className="min-h-screen bg-white text-gray-900 ">
-      <Hero/>
-      <CtaBlock/>
-      <div className="p-6">
-      <ProductGridSection
-        title="Most Popular"
-        productsFetcher={getMostPopularProducts}
-      />
+    <main>
+      <div className="min-h-screen bg-white text-gray-900">
+        <Hero />
+        <CtaBlock />
+
+        {/* Most Popular Products Section */}
+        <div className="p-6">
+          <ProductGridSection title="Most Popular" products={mostPopularProducts} />
+        </div>
+
+        {/* Top Categories Section */}
+        <div className="p-6 space-y-10">
+          {categories.map((category) => (
+            <CategoryGrid
+              key={category.id}
+              title={category.name}
+              products={category.products}
+              categoryId={category.id}
+            />
+          ))}
+        </div>
+
+        <Contact />
+        <Footer />
       </div>
-      <div className="p-6" > 
-      <CatagoriesGrid title="Animals" productsFetcher={getNewestProducts} />
-      <CatagoriesGrid title="Characters" productsFetcher={getNewestProducts} />
-      <CatagoriesGrid title="Objects" productsFetcher={getNewestProducts} />
-      <CatagoriesGrid title="Vehicle" productsFetcher={getNewestProducts} />
-      <CatagoriesGrid title="Textures" productsFetcher={getNewestProducts} />
-    </div>
-      <Contact/>
-    </div>
     </main>
-  )
+  );
 }
 
+// Generic product grid
 type ProductGridSectionProps = {
-  title: string
-  productsFetcher: () => Promise<Product[]>
-}
+  title: string;
+  products: Product[];
+};
 
-function ProductGridSection({
-  productsFetcher,
-  title,
-}: ProductGridSectionProps) {
+function ProductGridSection({ title, products }: ProductGridSectionProps) {
   return (
-    <>
     <div className="space-y-4">
       <div className="flex gap-4">
         <h2 className="text-3xl font-bold">{title}</h2>
@@ -77,63 +92,60 @@ function ProductGridSection({
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Suspense
-          fallback={
-            <>
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-            </>
-          }
-        >
-          <ProductSuspense productsFetcher={productsFetcher} />
-        </Suspense>
+        {products.length === 0 ? (
+          <>
+            <ProductCardSkeleton />
+            <ProductCardSkeleton />
+            <ProductCardSkeleton />
+          </>
+        ) : (
+          products.map((product) => (
+            <ProductCard
+              key={product.id}
+              {...product}
+              id={product.id} // Keep as string
+              category="Most Popular"
+            />
+          ))
+        )}
       </div>
     </div>
-    </>
-  )
+  );
 }
 
-function CatagoriesGrid({
-  productsFetcher,
-  title,
-}: ProductGridSectionProps) {
+// Category-specific product grid
+type CategoryGridProps = {
+  title: string;
+  products: Product[];
+  categoryId: string;
+};
+
+function CategoryGrid({ title, products, categoryId }: CategoryGridProps) {
   return (
-    <>
     <div className="space-y-4">
       <div className="flex gap-4">
         <h2 className="text-3xl font-bold">{title}</h2>
         <Button variant="outline" asChild>
-          <Link href="/products" className="space-x-2">
+          <Link href={`/products?category=${encodeURIComponent(categoryId)}`} className="space-x-2">
             <span>View All</span>
             <ArrowRight className="size-4" />
           </Link>
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Suspense
-          fallback={
-            <>
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-            </>
-          }
-        >
-          <ProductSuspense productsFetcher={productsFetcher} />
-        </Suspense>
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard
+              key={product.id}
+              {...product}
+              id={product.id} // No conversion
+              category={title}
+            />
+          ))
+        ) : (
+          <p>No products available in this category.</p>
+        )}
       </div>
     </div>
-    </>
-  )
-}
-
-async function ProductSuspense({
-  productsFetcher,
-}: {
-  productsFetcher: () => Promise<Product[]>
-}) {
-  return (await productsFetcher()).map(product => (
-    <ProductCard key={product.id} {...product} />
-  ))
+  );
 }

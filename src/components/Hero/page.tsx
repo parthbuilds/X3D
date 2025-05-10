@@ -125,7 +125,7 @@ export default function Hero() {
       ref={sectionRef}
       className="flex flex-col items-center justify-center h-svh bg-gray-50 relative overflow-hidden homeContainer"
     >
-      <h2 className="text-[2rem] sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center z-10">
+      <h2 className="text-[2rem] sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center z-2">
         <TextAnimate animation="slideUp" by="word">
           Discover High Quality 3D Assets
         </TextAnimate>
@@ -134,16 +134,16 @@ export default function Hero() {
       <TextAnimate
         animation="blurIn"
         by="word"
-        className="text-gray-600 mb-8 max-w-lg text-center z-10"
+        className="text-gray-600 mb-8 max-w-lg text-center z-2"
       >
         Find, buy, and customize stunning 3D models for your projects.
       </TextAnimate>
 
       <Input
-        className="w-full max-w-lg mx-auto mb-4 p-4 rounded-lg bg-gray-100 focus:ring-2 focus:ring-gray-400 z-10"
+        className="w-full max-w-lg mx-auto mb-4 p-4 rounded-lg bg-gray-100 focus:ring-2 focus:ring-gray-400 z-2"
         placeholder="Search 3D Assets..."
       />
-      <Button className="text-sm z-10" variant="default" onClick={handleExplore}>
+      <Button className="text-sm z-2" variant="default" onClick={handleExplore}>
         Explore Now
       </Button>
 

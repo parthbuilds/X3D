@@ -46,6 +46,9 @@ async function ProductsTable() {
         name: true,
         priceInCents: true,
         isAvailableForPurchase: true,
+        category: {
+          select: { name: true },
+        },
         _count: { select: { orders: true } },
       },
       orderBy: { name: "asc" },
@@ -63,6 +66,7 @@ async function ProductsTable() {
               <span className="sr-only">Available For Purchase</span>
             </TableHead>
             <TableHead>Name</TableHead>
+            <TableHead>Category</TableHead> {/* New Column */}
             <TableHead>Price</TableHead>
             <TableHead>Orders</TableHead>
             <TableHead className="w-0">
@@ -87,6 +91,7 @@ async function ProductsTable() {
                 )}
               </TableCell>
               <TableCell>{product.name}</TableCell>
+              <TableCell>{product.category?.name ?? "Uncategorized"}</TableCell> {/* New Cell */}
               <TableCell>{formatCurrency(product.priceInCents / 100)}</TableCell>
               <TableCell>{formatNumber(product._count.orders)}</TableCell>
               <TableCell>

@@ -30,7 +30,7 @@ export default function AdminLayout({
 
   // If the current path is /admin/login, do not show the navigation bar
   if (pathname === "/admin/login") {
-    return <main className="p-4 max-w-screen-xl mx-auto">{children}</main>
+    return <main className="p-2 max-w-screen-xl mx-auto">{children}</main>
   }
 
   return (
