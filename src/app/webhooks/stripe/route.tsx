@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     const userFields = {
       email,
-      password: "defaultPassword123", // Replace with a secure default or generated password
+      password: "", 
       orders: { create: { productId, pricePaidInCents } },
     }
     const {
