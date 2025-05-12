@@ -24,7 +24,7 @@
     "@stripe/react-stripe-js": "^2.5.1",
     "@stripe/stripe-js": "^3.0.6",
     "@types/three": "^0.176.0",
-    "bcrypt": "^6.0.0",
+    "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "embla-carousel-react": "^8.6.0",
