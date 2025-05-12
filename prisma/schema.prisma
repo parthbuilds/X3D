@@ -1,36 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Product {
-  id                     String                 @id @default(uuid())
-  name                   String
-  priceInCents           Int
-  filePath               String
-  imagePath              String
-  description            String
-  isAvailableForPurchase Boolean                @default(true)
-  createdAt              DateTime               @default(now())
-  updatedAt              DateTime               @updatedAt
-
-  categoryId             String?                // Made optional
-  category               Category?              @relation("CategoryToProduct", fields: [categoryId], references: [id], onDelete: SetNull)
-
-  orders                 Order[]
-  downloadVerifications  DownloadVerification[]
+  id                      String    @id @default(uuid())
+  name                    String
+  priceInCents            Int
+  filePath                String
+  imagePath               String
+  description             String
+  isAvailableForPurchase  Boolean   @default(true)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  categoryId              String?   
+  category                Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  orders                  Order[]
+  downloadVerifications   DownloadVerification[]
 }
 
 model Category {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
-  description String   // Add description field here
-
-  products    Product[] @relation("CategoryToProduct")
+  description String
+  products    Product[]
 }
 
 model User {
@@ -47,17 +49,16 @@ model Order {
   pricePaidInCents Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-
-  userId    String
-  productId String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  userId           String
+  productId        String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 }
 
 model DownloadVerification {
-  id        String   @id @default(uuid())
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

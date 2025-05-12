@@ -28,6 +28,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.10.5",
     "lucide-react": "^0.341.0",
     "motion": "^12.9.6",
     "next": "^14.1.0",
