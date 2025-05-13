@@ -1,9 +1,10 @@
 "use client"
 
-import * as React from "react";
-import Link from "next/link";
+import * as React from "react"
+import Link from "next/link"
+import { useEffect, useState } from "react"
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,132 +13,84 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+} from "@/components/ui/navigation-menu"
 
-const components = [
-  {
-    id: 1,
-    title: "Alert Dialog",
-    href: "/docs/primitives/alert-dialog",
-    description: "A modal dialog that interrupts the user with important content and expects a response.",
-  },
-  {
-    id: 2,
-    title: "Hover Card",
-    href: "/docs/primitives/hover-card",
-    description: "For sighted users to preview content available behind a link.",
-  },
-  {
-    id: 3,
-    title: "Progress",
-    href: "/docs/primitives/progress",
-    description: "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
-  },
-  {
-    id: 4,
-    title: "Scroll-area",
-    href: "/docs/primitives/scroll-area",
-    description: "Visually or semantically separates content.",
-  },
-  {
-    id: 5,
-    title: "Tabs",
-    href: "/docs/primitives/tabs",
-    description: "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
-  },
-  {
-    id: 6,
-    title: "Tooltip",
-    href: "/docs/primitives/tooltip",
-    description: "A popup that displays information related to an element when hovered or focused.",
-  },
-  {
-    id: 7,
-    title: "Alert Dialog",
-    href: "/docs/primitives/alert-dialog",
-    description: "A modal dialog that interrupts the user with important content and expects a response.",
-  },
-  {
-    id: 8,
-    title: "Hover Card",
-    href: "/docs/primitives/hover-card",
-    description: "For sighted users to preview content available behind a link.",
-  },
-  {
-    id: 9,
-    title: "Progress",
-    href: "/docs/primitives/progress",
-    description: "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
-  },
-  {
-    id: 10,
-    title: "Scroll-area",
-    href: "/docs/primitives/scroll-area",
-    description: "Visually or semantically separates content.",
-  },
-  {
-    id: 11,
-    title: "Tabs",
-    href: "/docs/primitives/tabs",
-    description: "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
-  },
-  {
-    id: 12,
-    title: "Tooltip",
-    href: "/docs/primitives/tooltip",
-    description: "A popup that displays information related to an element when hovered or focused.",
-  },
-];
+interface Category {
+  id: string
+  name: string
+  description: string
+}
 
 export function Menu() {
+  const [categories, setCategories] = useState<Category[]>([])
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/categories") // Adjust API path as necessary
+        const data = await res.json()
+        setCategories(data)
+      } catch (err) {
+        console.error("Failed to fetch categories", err)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
   return (
     <NavigationMenu>
       <NavigationMenuList>
+        {/* Getting Started (Updated for 3D Assets) */}
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-2 p-4 sm:w-full md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
               <li className="row-span-3">
                 <NavigationMenuLink asChild>
                   <Link
                     className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/"
+                    href="/products"
                   >
-                    <div className="mb-2 mt-4 text-lg font-medium">Discover latest Assets</div>
+                    <div className="mb-2 mt-4 text-lg font-medium">Discover 3D Assets</div>
                     <p className="text-sm leading-tight text-muted-foreground">
-                      Beautifully designed components built with Radix UI and Tailwind CSS.
+                      High-quality 3D models and assets for games, AR/VR, animation, and more.
                     </p>
                   </Link>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="/docs" title="Introduction">
-                Re-usable components built using Radix UI and Tailwind CSS.
+              <ListItem href="/products" title="All Assets">
+                Browse our complete collection of optimized and ready-to-use 3D models.
               </ListItem>
-              <ListItem href="/docs/installation" title="Installation">
-                How to install dependencies and structure your app.
+              <ListItem href="/products?category=Featured" title="Featured Models">
+                Handpicked assets that are trending and professionally crafted.
               </ListItem>
-              <ListItem href="/docs/primitives/typography" title="Typography">
-                Styles for headings, paragraphs, and lists.
+              <ListItem href="/contact" title="Need a Custom Asset?">
+                Get in touch with our team to commission or request custom 3D content.
               </ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+
+        {/* Dynamic Categories */}
         <NavigationMenuItem>
           <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid gap-3 p-4 sm:w-full md:w-[500px] md:grid-cols-2 lg:w-[600px] z-999">
-              {components.map((component) => (
+            <ul className="grid gap-3 p-4 sm:w-full md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+              {categories.map((category) => (
                 <ListItem
-                  key={component.id}
-                  title={component.title}
-                  href={component.href}
+                  key={category.id}
+                  title={category.name}
+                  href={`/products?category=${encodeURIComponent(category.name)}`}
                 >
-                  {component.description}
+                  {category.description}
                 </ListItem>
               ))}
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+
+        {/* Static Links */}
         <NavigationMenuItem>
           <Link href="/orders" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -154,12 +107,12 @@ export function Menu() {
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
-  );
+  )
 }
 
 interface ListItemProps extends React.ComponentPropsWithoutRef<"a"> {
-  title: string;
-  children: React.ReactNode;
+  title: string
+  children: React.ReactNode
 }
 
 const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
@@ -173,7 +126,7 @@ const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
               "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
               className
             )}
-            href={props.href as string} // Ensure href is cast to string
+            href={props.href as string}
             {...props}
           >
             <div className="text-sm font-medium leading-none">{title}</div>
@@ -181,7 +134,8 @@ const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
           </Link>
         </NavigationMenuLink>
       </li>
-    );
+    )
   }
-);
-ListItem.displayName = "ListItem";
+)
+
+ListItem.displayName = "ListItem"

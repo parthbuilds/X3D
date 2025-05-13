@@ -147,7 +147,11 @@ export default function Hero() {
         Explore Now
       </Button>
 
-      <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full z-0" />
+      <canvas
+        ref={canvasRef}
+        className="absolute top-0 left-0 w-full h-full z-10 pointer-events-none"
+      />
+
     </section>
   );
 }
