@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -11,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import Img from 'next/image';
+import { ProductCard } from '@/components/ProductCard'; // Update the path to the correct location
 
 type Category = {
   id: string;
@@ -23,11 +21,17 @@ type Product = {
   id: string;
   name: string;
   priceInCents: number;
+  filePath: string;
   imagePath: string;
+  description: string;
+  isAvailableForPurchase: boolean;
+  createdAt: string;
+  updatedAt: string;
   categoryId: string;
   category: {
     id: string;
     name: string;
+    description: string;
   };
 };
 
@@ -121,59 +125,26 @@ function ProductsClientPage() {
           </Select>
         </div>
 
-        {/* Category Cards */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Browse by Categories</h2>
+        {/* Product Grid */}
+        {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {categories.map((category) => (
-              <Card
-                key={category.id}
-                className="cursor-pointer hover:shadow-lg transition border border-gray-300 rounded-2xl"
-                onClick={() => handleCategoryChange(category.id)}
-              >
-                <CardHeader>
-                  <CardTitle>{category.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">{category.description}</p>
-                </CardContent>
-              </Card>
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                priceInCents={product.priceInCents}
+                description={product.description}
+                imagePath={product.imagePath || '/placeholder.jpg'}
+                category={product.category.name}
+              />
             ))}
           </div>
-        </div>
-
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <Card
-              key={product.id}
-              className="hover:shadow-lg transition border border-gray-300 rounded-2xl"
-            >
-              <Img
-                src={product.imagePath || '/placeholder.jpg'}
-                alt={product.name}
-                className="w-full h-48 object-cover rounded-t-2xl"
-                width={400}
-                height={300}
-              />
-              <CardHeader>
-                <CardTitle>{product.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Category: {product.category.name}</p>
-                <p className="text-lg font-bold">
-                  ₹{(product.priceInCents / 100).toFixed(2)}
-                </p>
-                <Button
-                  className="mt-4 w-full"
-                  onClick={() => handleViewDetails(product.id, product.categoryId)}
-                >
-                  View Details
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        ) : (
+          <div className="text-center mt-10 text-gray-600">
+            No products found for this category.
+          </div>
+        )}
       </div>
     </section>
   );
